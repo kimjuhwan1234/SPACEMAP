@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
+<<<<<<< HEAD
     <option name="sdkName" value="FE" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="SPACEMAP" project-jdk-type="Python SDK" />
+=======
+    <option name="sdkName" value="python_311" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="python_311" project-jdk-type="Python SDK" />
+>>>>>>> origin/main
   <component name="PyCharmDSProjectLayout">
     <option name="id" value="JupyterRightHiddenStructureLayout" />
   </component>
