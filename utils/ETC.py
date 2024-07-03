@@ -1,5 +1,7 @@
 import json
 import datetime
+
+import pandas as pd
 import requests
 import statistics
 import numpy as np
@@ -17,7 +19,7 @@ def get_spacemap_tles(time_dict: dict, norad_ids: list):
     # SEVERURL = "http://localhost:8082"
     tles = {}
     for norad_id in norad_ids:
-        url = f"{server_url}/tles/{time_dict['year']:02d}/{time_dict['month']:02d}/{time_dict['day']:02d}/{0:02d}?id={norad_id}"
+        url = f"{server_url}/tles/{time_dict['year']:02d}/{time_dict['month']:02d}/{time_dict['day']:02d}/{0:02d}?ids={norad_id}"
         response = requests.get(url)
         result = json.loads(response.text)
         tles[norad_id] = result["data"]["tles"][0]
@@ -127,19 +129,18 @@ def cal_kinematics_vector_point(time_dict: dict, first_line, second_line):
     return satellite, e, position, velocity
 
 
-def print_statistics(data: dict):
+def print_statistics(data: pd.DataFrame):
     '''
-    :param data: 딕셔너리
+    :param data: 데이터프레임
     :return: None
     '''
-    values = list(data.values())
 
-    min_value = min(values)
-    max_value = max(values)
-    average_value = statistics.mean(values)
-    median_value = statistics.median(values)
-    std_dev = statistics.stdev(values)
-    variance = statistics.variance(values)
+    min_value = data.values.min()
+    max_value = data.values.max()
+    average_value = data.values.mean()
+    median_value = np.median(data.values)
+    std_dev = data.values.std()
+    variance = data.values.var()
     data_range = max_value - min_value
 
     print(f"min: {min_value}")
@@ -149,13 +150,3 @@ def print_statistics(data: dict):
     print(f"standard deviation: {std_dev}")
     print(f"variance: {variance}")
     print(f"range: {data_range}\n")
-
-
-def find_max_key(data):
-    max_key = None
-    max_value = 0
-    for key, value in data.items():
-        if value > max_value:
-            max_key = key
-            max_value = value
-    return max_key

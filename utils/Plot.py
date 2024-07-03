@@ -57,11 +57,11 @@ def calculate_ylim(data):
 
 def draw_graph(data, title:str, ylabel, color="blue"):
     plt.figure(figsize=(10, 5))
-    formatted_dates = format_dates(data.keys())
-    plt.plot(formatted_dates, data.values(), color=color)
-    plot_vertical_lines(data.keys(), formatted_dates)
+    # formatted_dates = format_dates(data.keys())
+    plt.plot(data.index, data.values, color=color)
+    # plot_vertical_lines(data.keys(), formatted_dates)
     set_plot_params(title, ylabel)
-    ylim_min, ylim_max = calculate_ylim(list(data.values()))
+    ylim_min, ylim_max = calculate_ylim(list(data.values))
     plt.ylim(ylim_min, ylim_max)
     plt.show()
 
