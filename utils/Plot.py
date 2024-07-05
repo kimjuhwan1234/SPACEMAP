@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 def plot_orbit(positions: list):
     '''
@@ -55,10 +55,13 @@ def calculate_ylim(data):
     return ylim_min, ylim_max
 
 
-def draw_graph(data, title:str, ylabel, color="blue"):
+def draw_graph(data, title:str, ylabel, date_lst, color="blue"):
     plt.figure(figsize=(10, 5))
     # formatted_dates = format_dates(data.keys())
     plt.plot(data.index, data.values, color=color)
+    # for date in date_lst:
+    #     plt.axvline(pd.to_datetime(date), color='red', linestyle='--', label='Highlight Date')
+
     # plot_vertical_lines(data.keys(), formatted_dates)
     set_plot_params(title, ylabel)
     ylim_min, ylim_max = calculate_ylim(list(data.values))
