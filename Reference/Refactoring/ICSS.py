@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
 
@@ -85,5 +86,61 @@ def ol_detect(hour_df, diff_value, window_size, significant_level):
     ol_lst_time = []
     for point in ol_lst:
         ol_lst_time.append(hour_df.index[point])
+
+    return ol_lst_time
+
+
+def ol_detect_2024_KT(hour_df, diff_value, window_size, significant_level, filter_mode):
+    cv_lst = []
+    ol_lst = []
+    lambda_lst = []
+    current_lst = []
+    ol_lst_time = []
+
+    for i in tqdm(range(window_size, len(diff_value) + 1, 1)):
+        count = 0
+        if filter_mode == 'ON':
+            filter = []
+            for val in ol_lst:
+                if (i - window_size <= val) and (val < i):
+                    count += 1
+                    filter.append(val - (i))
+            X = diff_value[i - window_size - count: i].copy()
+            if len(filter) != 0:
+                X = np.delete(X, filter)
+
+        elif filter_mode == 'OFF':
+            X = diff_value[i - window_size - count: i].copy()
+
+        else:
+            raise
+
+        N = len(X)
+        T = N
+        m = int(T ** (1 / 4))
+
+        # CUSUM 계산
+        CUSUM = compute_CUSUM(X)
+        # gamma 계산
+        gamma = compute_gamma(X, T, m)
+        # lambda_hat 계산
+        lambda_hat = compute_lambda(gamma, m)
+        lambda_lst.append(lambda_hat)
+        # D_prime 계산
+        D_prime = compute_D_prime(CUSUM, T, lambda_hat)
+        # critical value 계산
+        critical_value = compute_percentile(D_prime, T, significant_level)
+        cv_lst.append(critical_value)
+        # 현재 통계량 계산
+        current_lst.append(np.abs(D_prime[-2]) * np.sqrt(T / 2))
+
+        if current_lst[-1] > critical_value:
+            ol_lst.append(i - 1)
+
+    ol_lst = list(np.where((np.array(current_lst) > np.array(cv_lst)))[0] + window_size - 1)
+    for point in ol_lst:
+        if (pd.to_datetime('2023-09-21') <= hour_df.index[point]) & (
+                hour_df.index[point] <= pd.to_datetime('2023-10-31')):
+            ol_lst_time.append(hour_df.index[point])
 
     return ol_lst_time
